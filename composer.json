@@ -1,0 +1,8 @@
+{
+    "name": "Jeremytubbs/api-auth",
+    "autoload": {
+        "psr-4": {
+            "Jeremytubbs\\ApiAuth\\": "src/"
+        }
+    }
+}
