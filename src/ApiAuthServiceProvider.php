@@ -13,6 +13,11 @@ class ApiAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Add api_token on creating user
+        \App\User::creating(function ($user) {
+            $user->api_token = str_random(60);
+        });
+
         // Load routes
         if (! $this->app->routesAreCached()) {
             require __DIR__.'/Http/routes.php';
