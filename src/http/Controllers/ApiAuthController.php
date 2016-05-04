@@ -42,7 +42,9 @@ class ApiAuthController extends Controller
         if ($throttles && $lockedOut = $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return $this->sendLockoutResponse($request);
+            $seconds = $this->secondsRemainingOnLockout($request);
+
+            return response(json_encode($this->getLockoutErrorMessage($seconds)), 429);
         }
 
         $credentials = $this->getCredentials($request);
@@ -88,17 +90,5 @@ class ApiAuthController extends Controller
     public function register(Request $request)
     {
         //
-    }
-
-    /**
-     * Determine if the class is using the ThrottlesLogins trait.
-     *
-     * @return bool
-     */
-    protected function isUsingThrottlesLoginsTrait()
-    {
-        return in_array(
-            ThrottlesLogins::class, class_uses_recursive(static::class)
-        );
     }
 }
