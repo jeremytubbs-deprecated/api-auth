@@ -3,16 +3,14 @@
 namespace Jeremytubbs\ApiAuth\Http\Controllers;
 
 use Auth;
+use Validator;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use App\Http\Controllers\Auth\AuthController;
 
-class ApiAuthController extends Controller
+class ApiAuthController extends AuthController
 {
-    use AuthenticatesAndRegistersUsers, ThrottlesLogins;
-
     /**
      * Handle a login request to the application.
      *
@@ -82,13 +80,36 @@ class ApiAuthController extends Controller
                     ->header('Authorization', 'Bearer ' . $user->api_token);
     }
 
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function postRegister(Request $request)
     {
         return $this->register($request);
     }
 
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function register(Request $request)
     {
-        //
+        $validator = $this->validator($request->all());
+
+        if ($validator->fails()) {
+            return response($validator->errors()->all(), 400);
+        }
+
+        Auth::guard($this->getGuard())->login($this->create($request->all()));
+
+        $user = Auth::guard($this->getGuard())->user();
+
+        return response($user, 200)
+                ->header('Authorization', 'Bearer ' . $user->api_token);
     }
 }
