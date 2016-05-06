@@ -42,7 +42,7 @@ class ApiAuthController extends AuthController
 
             $seconds = $this->secondsRemainingOnLockout($request);
 
-            return response(json_encode($this->getLockoutErrorMessage($seconds)), 429);
+            return response(['error' => $this->getLockoutErrorMessage($seconds)], 429);
         }
 
         $credentials = $this->getCredentials($request);
@@ -58,7 +58,7 @@ class ApiAuthController extends AuthController
             $this->incrementLoginAttempts($request);
         }
 
-        return response(json_encode($this->getFailedLoginMessage()), 400);
+        return response(['error' => $this->getFailedLoginMessage()], 400);
     }
 
     /**
@@ -102,7 +102,7 @@ class ApiAuthController extends AuthController
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
-            return response($validator->errors()->all(), 400);
+            return response(['error' => $validator->errors()->all()], 400);
         }
 
         Auth::guard($this->getGuard())->login($this->create($request->all()));
